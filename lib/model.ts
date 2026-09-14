@@ -4,6 +4,7 @@ export type Activity = {
   title: string;
   body: string;
   starter?: string;
+  slide?: { assetId: string; page: number; filename: string; text: string };
 };
 export type Project = {
   id: string;
@@ -65,7 +66,14 @@ export function readStore(raw: string | null): Store {
     ['presentation', 'theory', 'coding'].includes(a.kind) &&
     typeof a.title === 'string' &&
     typeof a.body === 'string' &&
-    (a.starter === undefined || typeof a.starter === 'string');
+    (a.starter === undefined || typeof a.starter === 'string') &&
+    (a.slide === undefined ||
+      (a.slide &&
+        typeof a.slide.assetId === 'string' &&
+        Number.isInteger(a.slide.page) &&
+        a.slide.page > 0 &&
+        typeof a.slide.filename === 'string' &&
+        typeof a.slide.text === 'string'));
   const projectValid = (p: Project) =>
     p &&
     typeof p.id === 'string' &&

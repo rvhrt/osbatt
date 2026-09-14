@@ -18,6 +18,7 @@
     "lucide-react": "1.45.0",
     "monaco-editor": "0.52.2",
     "next": "16.3.5",
+    "pdfjs-dist": "6.3.289",
     "react": "19.3.0",
     "react-dom": "19.3.0"
   },

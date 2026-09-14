@@ -22,7 +22,9 @@ import {
 import { Activity, Project, Run, Store, initialStore, readStore } from '@/lib/model';
 const CodeEditor = dynamic(() => import('./code-editor'), { ssr: false });
 const key = 'osbatt.workspace.v1';
-const icons = { presentation: Presentation, theory: FileText, coding: Code2 };
+import ActivityRow from './activity-row';
+import SlideImage from './slide-image';
+const PdfImport = dynamic(() => import('./pdf-import'), { ssr: false });
 const date = (s: string) =>
   new Date(s).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 
@@ -187,10 +189,21 @@ export default function Osbatt() {
                   ? 'Presentation'
                   : `${current.kind === 'coding' ? 'Programming' : 'Theory'} question`}
               </div>
-              <div className="question-content">
+              <div className={`question-content ${current.slide ? 'has-slide' : ''}`}>
                 <span className="eyebrow">{rehearsal.project.title}</span>
                 <h1>{current.title}</h1>
-                <div className="question-body">{current.body}</div>
+                <>
+                  {current.slide && (
+                    <>
+                      <SlideImage slide={current.slide} />
+                      <details className="slide-text">
+                        <summary>Slide text</summary>
+                        <p>{current.slide.text || 'This slide has no extractable text.'}</p>
+                      </details>
+                    </>
+                  )}
+                  <div className="question-body">{current.body}</div>
+                </>
                 {current.kind === 'coding' && (
                   <div className="constraint">
                     <span className="eyebrow">WORKSPACE</span>
@@ -335,6 +348,7 @@ export default function Osbatt() {
                   <section className="review-answer" key={a.id}>
                     <span className="eyebrow">{a.kind}</span>
                     <h2>{a.title}</h2>
+                    {a.slide && <SlideImage slide={a.slide} />}
                     <p className="question-body">{a.body}</p>
                     <pre>{review.answers[a.id] || 'No answer recorded.'}</pre>
                   </section>
@@ -370,13 +384,50 @@ export default function Osbatt() {
                 <h2>
                   Session content <span>{project.activities.length}</span>
                 </h2>
-                <span className="muted">Live hosting and PDF import are coming next</span>
+                <PdfImport
+                  disabled={storageBlocked.current}
+                  onImport={(activities) => {
+                    const next = {
+                      ...store,
+                      projects: store.projects.map((p) =>
+                        p.id === project.id
+                          ? {
+                              ...p,
+                              activities: [...p.activities, ...activities],
+                              updatedAt: new Date().toISOString(),
+                            }
+                          : p,
+                      ),
+                    };
+                    try {
+                      localStorage.setItem(key, JSON.stringify(next));
+                    } catch {
+                      throw new Error('Could not save project. Browser storage may be full.');
+                    }
+                    setStore(next);
+                  }}
+                />
               </div>
               {project.activities.map((a, i) => (
                 <ActivityRow
                   key={a.id}
                   activity={a}
                   index={i}
+                  count={project.activities.length}
+                  onMove={(offset) => {
+                    const activities = [...project.activities];
+                    [activities[i], activities[i + offset]] = [
+                      activities[i + offset],
+                      activities[i],
+                    ];
+                    updateProject({ ...project, activities });
+                  }}
+                  onRemove={() =>
+                    updateProject({
+                      ...project,
+                      activities: project.activities.filter((item) => item.id !== a.id),
+                    })
+                  }
                   onSave={(next) =>
                     updateProject({
                       ...project,
@@ -607,68 +658,5 @@ function ProjectDialog({
         </div>
       </form>
     </dialog>
-  );
-}
-
-function ActivityRow({
-  activity,
-  index,
-  onSave,
-}: {
-  activity: Activity;
-  index: number;
-  onSave: (a: Activity) => void;
-}) {
-  const [open, setOpen] = useState(false);
-  const Icon = icons[activity.kind];
-  return (
-    <div className="activity">
-      <button className="activity-summary" aria-expanded={open} onClick={() => setOpen((v) => !v)}>
-        <span className="activity-number">{String(index + 1).padStart(2, '0')}</span>
-        <Icon size={17} />
-        <strong>{activity.title}</strong>
-        <span className="muted">{activity.kind}</span>
-        <ChevronRight size={16} className={open ? 'rotated' : ''} />
-      </button>
-      {open && (
-        <form
-          className="activity-form"
-          onSubmit={(e) => {
-            e.preventDefault();
-            const data = new FormData(e.currentTarget);
-            const title = String(data.get('title')).trim();
-            if (!title) return;
-            onSave({
-              ...activity,
-              title,
-              body: String(data.get('body')),
-              ...(activity.kind === 'coding' ? { starter: String(data.get('starter')) } : {}),
-            });
-            setOpen(false);
-          }}
-        >
-          <label>
-            Title
-            <input name="title" required maxLength={150} defaultValue={activity.title} />
-          </label>
-          <label>
-            Content
-            <textarea name="body" defaultValue={activity.body} rows={5} />
-          </label>
-          {activity.kind === 'coding' && (
-            <label>
-              Starter file · main.c
-              <textarea
-                className="code-input"
-                name="starter"
-                defaultValue={activity.starter}
-                rows={8}
-              />
-            </label>
-          )}
-          <button className="button primary">Save section</button>
-        </form>
-      )}
-    </div>
   );
 }
