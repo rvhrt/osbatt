@@ -9,3 +9,5 @@ test-results/
 .osbatt-write-check
 
 public/monaco/
+
+next-env.d.ts
