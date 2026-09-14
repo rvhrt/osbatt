@@ -16,6 +16,7 @@ Open http://localhost:3000. Monaco assets are served locally; the editor does no
 ## Current features
 
 - Reusable projects with editable explanation, theory and coding sections.
+- Markdown title/description editors with formatting controls and previews. Titles use inline formatting; descriptions and question content support blocks, lists, tables and links. Raw HTML and remote images are not rendered.
 - Local PDF import (50 MB / 200 pages), page previews, reordering and removal.
 - Attach theory or C activities to slides; upload one starter .c file as main.c.
 - Expand slides for reading small code and diagrams. Original colours are preserved.

@@ -1026,3 +1026,139 @@ select {
   background: var(--hover);
   outline-offset: -2px;
 }
+.markdown {
+  line-height: 1.75;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.markdown p {
+  margin: 0 0 14px;
+}
+.markdown > :last-child {
+  margin-bottom: 0;
+}
+.markdown h1,
+.markdown h2,
+.markdown h3 {
+  margin: 20px 0 10px;
+  font-size: 1.25em;
+  line-height: 1.4;
+  letter-spacing: 0;
+}
+.markdown ul,
+.markdown ol {
+  padding-left: 24px;
+  margin: 10px 0;
+}
+.markdown a {
+  color: var(--accent);
+  text-decoration: underline;
+}
+.markdown code,
+.markdown-inline code {
+  font-family: ui-monospace, Consolas, monospace;
+  background: var(--hover);
+  padding: 2px 5px;
+  border-radius: 3px;
+  font-size: 0.9em;
+}
+.markdown pre {
+  padding: 16px;
+  background: var(--input);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  overflow: auto;
+  white-space: pre;
+}
+.markdown pre code {
+  padding: 0;
+  background: none;
+}
+.markdown blockquote {
+  margin: 15px 0;
+  padding-left: 15px;
+  border-left: 2px solid var(--line);
+  color: var(--muted);
+}
+.markdown table {
+  display: block;
+  overflow: auto;
+  border-collapse: collapse;
+  margin: 15px 0;
+}
+.markdown th,
+.markdown td {
+  border: 1px solid var(--line);
+  padding: 8px 12px;
+}
+.markdown input[type='checkbox'] {
+  display: inline;
+  width: auto;
+  margin: 0 6px 0 0;
+}
+.markdown-field {
+  margin-bottom: 20px;
+}
+.markdown-field > label {
+  margin-bottom: 8px;
+}
+.markdown-field input,
+.markdown-field textarea {
+  margin-top: 0;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+.markdown-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 5px;
+  border: 1px solid var(--line);
+  border-bottom: 0;
+  border-radius: 4px 4px 0 0;
+  flex-wrap: wrap;
+}
+.markdown-toolbar button {
+  border: 0;
+  background: none;
+  padding: 5px 8px;
+  border-radius: 3px;
+  font-size: 12px;
+  min-width: 27px;
+}
+.markdown-toolbar button:hover {
+  background: var(--hover);
+}
+.markdown-toolbar > span {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 10px;
+  padding-right: 6px;
+}
+.markdown-preview {
+  margin-top: 8px;
+  font-size: 12px;
+}
+.markdown-preview summary {
+  cursor: pointer;
+  color: var(--muted);
+}
+.markdown-preview > div {
+  padding: 15px;
+  border: 1px solid var(--line);
+  margin-top: 8px;
+  border-radius: 4px;
+}
+.page-heading > div:first-child {
+  min-width: 0;
+}
+.page-heading .markdown {
+  max-width: 650px;
+  color: var(--muted);
+}
+.question-content > .markdown {
+  margin-top: 20px;
+}
+.question-content > .markdown h1 {
+  font-size: 1.25em;
+}

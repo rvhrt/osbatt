@@ -23,6 +23,8 @@ import { Activity, Project, Run, Store, initialStore, readStore } from '@/lib/mo
 const CodeEditor = dynamic(() => import('./code-editor'), { ssr: false });
 const key = 'osbatt.workspace.v1';
 import ActivityRow from './activity-row';
+import Markdown from './markdown';
+import MarkdownField from './markdown-field';
 import SlideImage from './slide-image';
 const PdfImport = dynamic(() => import('./pdf-import'), { ssr: false });
 const date = (s: string) =>
@@ -139,7 +141,7 @@ export default function Osbatt() {
         </button>
         <span className="top-divider" />
         <span className="top-context">
-          {rehearsal ? rehearsal.project.title : 'Teaching workspace'}
+          <Markdown inline>{rehearsal ? rehearsal.project.title : 'Teaching workspace'}</Markdown>
         </span>
         <div className="top-right">
           <span className="local-label">Local preview</span>
@@ -191,8 +193,12 @@ export default function Osbatt() {
                   : `${current.kind === 'coding' ? 'Programming' : 'Theory'} question`}
               </div>
               <div className={`question-content ${current.slide ? 'has-slide' : ''}`}>
-                <span className="eyebrow">{rehearsal.project.title}</span>
-                <h1>{current.title}</h1>
+                <span className="eyebrow">
+                  <Markdown inline>{rehearsal.project.title}</Markdown>
+                </span>
+                <h1>
+                  <Markdown inline>{current.title}</Markdown>
+                </h1>
                 <>
                   {current.slide && (
                     <>
@@ -203,7 +209,7 @@ export default function Osbatt() {
                       </details>
                     </>
                   )}
-                  <div className="question-body">{current.body}</div>
+                  <Markdown>{current.body}</Markdown>
                 </>
                 {current.kind === 'coding' && (
                   <div className="constraint">
@@ -338,7 +344,9 @@ export default function Osbatt() {
               <div className="page-heading">
                 <div>
                   <span className="eyebrow">LOCAL REHEARSAL · {date(review.endedAt)}</span>
-                  <h1>{review.project.title}</h1>
+                  <h1>
+                    <Markdown inline>{review.project.title}</Markdown>
+                  </h1>
                   <p>Question and answer snapshots from this run.</p>
                 </div>
               </div>
@@ -347,9 +355,11 @@ export default function Osbatt() {
                 .map((a) => (
                   <section className="review-answer" key={a.id}>
                     <span className="eyebrow">{a.kind}</span>
-                    <h2>{a.title}</h2>
+                    <h2>
+                      <Markdown inline>{a.title}</Markdown>
+                    </h2>
                     {a.slide && <SlideImage slide={a.slide} />}
-                    <p className="question-body">{a.body}</p>
+                    <Markdown>{a.body}</Markdown>
                     <pre>{review.answers[a.id] || 'No answer recorded.'}</pre>
                   </section>
                 ))}
@@ -362,8 +372,10 @@ export default function Osbatt() {
               <div className="page-heading">
                 <div>
                   <span className="eyebrow">PROJECT</span>
-                  <h1>{project.title}</h1>
-                  {project.description && <p>{project.description}</p>}
+                  <h1>
+                    <Markdown inline>{project.title}</Markdown>
+                  </h1>
+                  {project.description && <Markdown>{project.description}</Markdown>}
                 </div>
                 <div className="actions">
                   <button className="button" onClick={() => setEditing(true)}>
@@ -524,8 +536,12 @@ export default function Osbatt() {
                       <Presentation size={20} />
                     </span>
                     <div>
-                      <strong>{p.title}</strong>
-                      <p>{p.description || 'No description yet'}</p>
+                      <strong>
+                        <Markdown inline>{p.title}</Markdown>
+                      </strong>
+                      <p>
+                        <Markdown inline>{p.description || 'No description yet'}</Markdown>
+                      </p>
                     </div>
                   </div>
                   <span className="muted">{p.activities.length} sections</span>
@@ -564,7 +580,9 @@ export default function Osbatt() {
                 store.runs.map((run) => (
                   <button className="history-row" key={run.id} onClick={() => setReview(run)}>
                     <div>
-                      <strong>{run.project.title}</strong>
+                      <strong>
+                        <Markdown inline>{run.project.title}</Markdown>
+                      </strong>
                       <p>
                         Local rehearsal ·{' '}
                         {Object.values(run.answers).filter((a) => a.trim()).length} answers
@@ -646,26 +664,23 @@ function ProjectDialog({
             <X size={18} />
           </button>
         </div>
-        <label>
-          Project name
-          <input
-            autoFocus
-            required
-            maxLength={100}
-            name="title"
-            defaultValue={project?.title}
-            placeholder="e.g. Trees and recursion"
-          />
-        </label>
-        <label>
-          Description <span className="muted">(optional)</span>
-          <textarea
-            name="description"
-            maxLength={300}
-            defaultValue={project?.description}
-            placeholder="Project description"
-          />
-        </label>
+        <MarkdownField
+          label="Project name"
+          name="title"
+          defaultValue={project?.title}
+          inline
+          required
+          maxLength={150}
+          autoFocus
+          placeholder="Project title"
+        />
+        <MarkdownField
+          label="Description"
+          name="description"
+          defaultValue={project?.description}
+          maxLength={10000}
+          placeholder="Project description"
+        />
         <div className="dialog-footer">
           <button type="button" className="button" onClick={onClose}>
             Cancel

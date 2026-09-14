@@ -12,6 +12,8 @@ import {
 import type { Activity } from '@/lib/model';
 import SlideImage from './slide-image';
 import InsertMenu from './insert-menu';
+import Markdown from './markdown';
+import MarkdownField from './markdown-field';
 const icons = { presentation: Presentation, theory: FileText, coding: Code2 };
 export default function ActivityRow({
   activity,
@@ -49,7 +51,9 @@ export default function ActivityRow({
         >
           <span className="activity-number">{String(index + 1).padStart(2, '0')}</span>
           {activity.slide ? <SlideImage slide={activity.slide} thumbnail /> : <Icon size={17} />}
-          <strong>{activity.title}</strong>
+          <strong>
+            <Markdown inline>{activity.title}</Markdown>
+          </strong>
           <span className="muted">{activity.kind}</span>
           <ChevronRight size={16} className={open ? 'rotated' : ''} />
         </button>
@@ -107,10 +111,14 @@ export default function ActivityRow({
               </p>
             </div>
           )}
-          <label>
-            Title
-            <input name="title" required maxLength={150} defaultValue={activity.title} />
-          </label>
+          <MarkdownField
+            label="Title"
+            name="title"
+            inline
+            required
+            maxLength={150}
+            defaultValue={activity.title}
+          />
           <label>
             Section type
             <select value={kind} onChange={(e) => setKind(e.target.value as Activity['kind'])}>
@@ -119,10 +127,11 @@ export default function ActivityRow({
               <option value="coding">C programming</option>
             </select>
           </label>
-          <label>
-            {activity.slide ? 'Additional instructions' : 'Content'}
-            <textarea name="body" defaultValue={activity.body} rows={5} />
-          </label>
+          <MarkdownField
+            label={activity.slide ? 'Additional instructions' : 'Content'}
+            name="body"
+            defaultValue={activity.body}
+          />
           {kind === 'coding' && (
             <>
               <label>
