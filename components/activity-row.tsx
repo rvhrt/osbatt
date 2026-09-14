@@ -1,7 +1,6 @@
 'use client';
 import { useState } from 'react';
 import {
-  Plus,
   ArrowUp,
   ArrowDown,
   Trash2,
@@ -12,6 +11,7 @@ import {
 } from 'lucide-react';
 import type { Activity } from '@/lib/model';
 import SlideImage from './slide-image';
+import InsertMenu from './insert-menu';
 const icons = { presentation: Presentation, theory: FileText, coding: Code2 };
 export default function ActivityRow({
   activity,
@@ -33,7 +33,6 @@ export default function ActivityRow({
   initiallyOpen?: boolean;
 }) {
   const [open, setOpen] = useState(initiallyOpen);
-  const [inserting, setInserting] = useState(false);
   const [kind, setKind] = useState(activity.kind);
   const [starter, setStarter] = useState(
     activity.starter ?? '#include <stdio.h>\n\nint main(void) {\n    return 0;\n}\n',
@@ -55,15 +54,7 @@ export default function ActivityRow({
           <ChevronRight size={16} className={open ? 'rotated' : ''} />
         </button>
         <div className="activity-controls">
-          <button
-            className="button insert-toggle"
-            aria-label={`Insert section near ${activity.title}`}
-            aria-expanded={inserting}
-            onClick={() => setInserting((v) => !v)}
-          >
-            <Plus size={15} />
-            Insert
-          </button>
+          <InsertMenu title={activity.title} onInsert={onInsert} />
           <button
             className="icon-button"
             aria-label={`Move ${activity.title} up`}
@@ -96,29 +87,6 @@ export default function ActivityRow({
           </button>
         </div>
       </div>
-      {inserting && (
-        <div className="insert-options" role="group" aria-label={`Insert near ${activity.title}`}>
-          {(['theory', 'coding'] as const).map((kind) => (
-            <div key={kind}>
-              <span className="muted">{kind === 'theory' ? 'Theory' : 'Coding'}</span>
-              {([0, 1] as const).map((offset) => (
-                <button
-                  key={offset}
-                  className="button"
-                  aria-label={`${kind === 'theory' ? 'Theory' : 'Coding'} ${offset === 0 ? 'above' : 'below'}`}
-                  onClick={() => {
-                    onInsert(kind, offset);
-                    setInserting(false);
-                  }}
-                >
-                  {offset === 0 ? <ArrowUp size={14} /> : <ArrowDown size={14} />}
-                  {offset === 0 ? 'Above' : 'Below'}
-                </button>
-              ))}
-            </div>
-          ))}
-        </div>
-      )}
       {open && (
         <form
           className="activity-form"

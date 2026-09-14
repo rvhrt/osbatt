@@ -107,12 +107,23 @@ test('inserts theory and coding sections on either side of a slide', async ({ pa
     .setInputFiles(path.join(__dirname, 'fixtures/slides.pdf'));
   await page.getByRole('button', { name: 'Add slides' }).click();
   await expect(page.getByRole('dialog')).toHaveCount(0);
+  const above = page.getByRole('button', { name: 'Insert above Slide 1', exact: true });
+  await above.click();
+  await expect(page.getByRole('menuitem', { name: 'Theory', exact: true })).toBeFocused();
+  await page.keyboard.press('ArrowDown');
+  await expect(page.getByRole('menuitem', { name: 'Coding', exact: true })).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('menu')).toHaveCount(0);
+  await expect(above).toBeFocused();
+  await above.click();
+  await page.getByRole('heading', { name: 'Imported deck', exact: true }).click();
+  await expect(page.getByRole('menu')).toHaveCount(0);
   for (const [kind, position, title] of [
     ['Theory', 'above', 'Before slide'],
     ['Coding', 'below', 'After slide'],
   ]) {
-    await page.getByRole('button', { name: 'Insert section near Slide 1', exact: true }).click();
-    await page.getByRole('button', { name: `${kind} ${position}`, exact: true }).click();
+    await page.getByRole('button', { name: `Insert ${position} Slide 1`, exact: true }).click();
+    await page.getByRole('menuitem', { name: kind, exact: true }).click();
     await page.getByRole('textbox', { name: 'Title', exact: true }).fill(title);
     await page.getByRole('button', { name: 'Save section' }).click();
   }
@@ -123,12 +134,12 @@ test('inserts theory and coding sections on either side of a slide', async ({ pa
     'Slide 2',
     'Slide 3',
   ]);
-  await page.getByRole('button', { name: 'Insert section near Before slide', exact: true }).click();
-  await page.getByRole('button', { name: 'Coding above', exact: true }).click();
+  await page.getByRole('button', { name: 'Insert above Before slide', exact: true }).click();
+  await page.getByRole('menuitem', { name: 'Coding', exact: true }).click();
   await page.getByRole('textbox', { name: 'Title', exact: true }).fill('First coding');
   await page.getByRole('button', { name: 'Save section' }).click();
-  await page.getByRole('button', { name: 'Insert section near After slide', exact: true }).click();
-  await page.getByRole('button', { name: 'Theory below', exact: true }).click();
+  await page.getByRole('button', { name: 'Insert below After slide', exact: true }).click();
+  await page.getByRole('menuitem', { name: 'Theory', exact: true }).click();
   await page.getByRole('textbox', { name: 'Title', exact: true }).fill('Last theory');
   await page.getByRole('button', { name: 'Save section' }).click();
   await page.reload();
