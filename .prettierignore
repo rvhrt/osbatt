@@ -1,0 +1,9 @@
+node_modules
+.next
+public/monaco
+package-lock.json
+playwright-report
+test-results
+next-env.d.ts
+
+README.md
