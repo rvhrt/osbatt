@@ -987,3 +987,28 @@ select {
     overflow-wrap: anywhere;
   }
 }
+.insert-toggle {
+  padding: 6px 9px;
+  min-height: 30px;
+  margin-right: 5px;
+}
+.insert-options {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  padding: 12px 16px;
+  border-top: 1px solid var(--line);
+  background: var(--surface);
+}
+.insert-options > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.insert-options .muted {
+  min-width: 45px;
+}
+.insert-options .button {
+  padding: 6px 9px;
+  min-height: 30px;
+}

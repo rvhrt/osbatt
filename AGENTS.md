@@ -17,3 +17,5 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Never execute student code or shell commands on the application host.
 
 - Preserve the original README.md unchanged; keep setup notes in docs/development.md.
+
+- Use plain functional UI copy. Avoid taglines, promotional text and motivational filler.

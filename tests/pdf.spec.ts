@@ -99,3 +99,48 @@ test('user deck preserves all 115 pages', async ({ page }) => {
   await page.getByRole('button', { name: /Imported deck No description/ }).click();
   await expect(page.locator('.activity-summary')).toHaveCount(115);
 });
+
+test('inserts theory and coding sections on either side of a slide', async ({ page }) => {
+  await newProject(page);
+  await page
+    .getByLabel('Presentation PDF')
+    .setInputFiles(path.join(__dirname, 'fixtures/slides.pdf'));
+  await page.getByRole('button', { name: 'Add slides' }).click();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  for (const [kind, position, title] of [
+    ['Theory', 'above', 'Before slide'],
+    ['Coding', 'below', 'After slide'],
+  ]) {
+    await page.getByRole('button', { name: 'Insert section near Slide 1', exact: true }).click();
+    await page.getByRole('button', { name: `${kind} ${position}`, exact: true }).click();
+    await page.getByRole('textbox', { name: 'Title', exact: true }).fill(title);
+    await page.getByRole('button', { name: 'Save section' }).click();
+  }
+  await expect(page.locator('.activity-summary strong')).toHaveText([
+    'Before slide',
+    'Slide 1',
+    'After slide',
+    'Slide 2',
+    'Slide 3',
+  ]);
+  await page.getByRole('button', { name: 'Insert section near Before slide', exact: true }).click();
+  await page.getByRole('button', { name: 'Coding above', exact: true }).click();
+  await page.getByRole('textbox', { name: 'Title', exact: true }).fill('First coding');
+  await page.getByRole('button', { name: 'Save section' }).click();
+  await page.getByRole('button', { name: 'Insert section near After slide', exact: true }).click();
+  await page.getByRole('button', { name: 'Theory below', exact: true }).click();
+  await page.getByRole('textbox', { name: 'Title', exact: true }).fill('Last theory');
+  await page.getByRole('button', { name: 'Save section' }).click();
+  await page.reload();
+  await page.getByRole('button', { name: /Imported deck No description/ }).click();
+  await expect(page.locator('.activity-summary strong')).toHaveText([
+    'First coding',
+    'Before slide',
+    'Slide 1',
+    'After slide',
+    'Last theory',
+    'Slide 2',
+    'Slide 3',
+  ]);
+  await expect(page.locator('.slide-thumbnail')).toHaveCount(3);
+});

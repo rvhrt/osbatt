@@ -29,13 +29,13 @@ export type Store = {
 export const sample: Project = {
   id: 'linked-lists',
   title: 'Linked lists',
-  description: 'Pointers, traversal and a little recursion.',
+  description: 'Pointers, traversal and recursion.',
   updatedAt: '2026-09-14T00:00:00Z',
   activities: [
     {
       id: 'intro',
       kind: 'presentation',
-      title: 'One node at a time.',
+      title: 'Linked list traversal',
       body: 'A linked list is a sequence of nodes. Each node stores a value and a pointer to the next node.\n\nToday, we’ll trace a list, reason about the cost of traversal, and write a recursive function.',
     },
     {

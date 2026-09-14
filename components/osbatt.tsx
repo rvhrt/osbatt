@@ -38,6 +38,7 @@ export default function Osbatt() {
   const [editing, setEditing] = useState(false);
   const [creating, setCreating] = useState(false);
   const [index, setIndex] = useState(0);
+  const [newSectionId, setNewSectionId] = useState<string | null>(null);
   const [rehearsal, setRehearsal] = useState<{ project: Project; startedAt: string } | null>(null);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [review, setReview] = useState<Run | null>(null);
@@ -214,7 +215,6 @@ export default function Osbatt() {
                   </div>
                 )}
               </div>
-              <div className="question-footer">Take your time. Work through it together.</div>
             </section>
             {current.kind !== 'presentation' && (
               <section className="answer-pane">
@@ -256,7 +256,7 @@ export default function Osbatt() {
                   <textarea
                     className="theory-input"
                     aria-label="Your answer"
-                    placeholder="Start with what you know. Explain your reasoning…"
+                    placeholder="Enter your answer…"
                     value={answers[current.id] ?? ''}
                     onChange={(e) => changeAnswer(e.target.value)}
                   />
@@ -363,7 +363,7 @@ export default function Osbatt() {
                 <div>
                   <span className="eyebrow">PROJECT</span>
                   <h1>{project.title}</h1>
-                  <p>{project.description || 'Your next teaching session starts here.'}</p>
+                  {project.description && <p>{project.description}</p>}
                 </div>
                 <div className="actions">
                   <button className="button" onClick={() => setEditing(true)}>
@@ -414,6 +414,23 @@ export default function Osbatt() {
                   activity={a}
                   index={i}
                   count={project.activities.length}
+                  initiallyOpen={a.id === newSectionId}
+                  onInsert={(kind, offset) => {
+                    const id = crypto.randomUUID();
+                    const activity: Activity = {
+                      id,
+                      kind,
+                      title: kind === 'theory' ? 'New theory question' : 'New coding question',
+                      body: '',
+                      ...(kind === 'coding'
+                        ? { starter: '#include <stdio.h>\n\nint main(void) {\n    return 0;\n}\n' }
+                        : {}),
+                    };
+                    const activities = [...project.activities];
+                    activities.splice(i + offset, 0, activity);
+                    setNewSectionId(id);
+                    updateProject({ ...project, activities });
+                  }}
                   onMove={(offset) => {
                     const activities = [...project.activities];
                     [activities[i], activities[i + offset]] = [
@@ -441,7 +458,7 @@ export default function Osbatt() {
               {!project.activities.length && (
                 <div className="empty">
                   <Presentation size={28} />
-                  <h2>A blank canvas.</h2>
+                  <h2>No sections</h2>
                   <p>Add an explanation, theory question or programming exercise.</p>
                 </div>
               )}
@@ -487,7 +504,7 @@ export default function Osbatt() {
                 <div>
                   <span className="eyebrow">YOUR WORKSPACE</span>
                   <h1>Projects</h1>
-                  <p>A place for your slides, questions and good discussions.</p>
+                  <p>Slides and questions.</p>
                 </div>
                 <button className="button primary" onClick={() => setCreating(true)}>
                   <Plus size={17} />
@@ -527,13 +544,13 @@ export default function Osbatt() {
                 <div>
                   <span className="eyebrow">PAST SESSIONS</span>
                   <h1>History</h1>
-                  <p>Return to the questions, and the thinking behind the answers.</p>
+                  <p>Previous sessions and responses.</p>
                 </div>
               </div>
               {!store.runs.length ? (
                 <div className="empty">
                   <Clock3 size={30} />
-                  <h2>Nothing here just yet.</h2>
+                  <h2>No previous sessions</h2>
                   <p>
                     Finish a project rehearsal to see its saved answers here.
                     <br />
@@ -567,7 +584,6 @@ export default function Osbatt() {
             </>
           )}
           <footer className="dashboard-footer">
-            <span>Built for the room.</span>
             <span>OSBATT / interface preview</span>
           </footer>
         </main>
@@ -647,7 +663,7 @@ function ProjectDialog({
             name="description"
             maxLength={300}
             defaultValue={project?.description}
-            placeholder="What will your students work on?"
+            placeholder="Project description"
           />
         </label>
         <div className="dialog-footer">
