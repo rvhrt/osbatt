@@ -15,3 +15,5 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Default to dark mode; use shared colour tokens for both themes.
 - Distinguish local rehearsals from live sessions in UI and data.
 - Never execute student code or shell commands on the application host.
+
+- Preserve the original README.md unchanged; keep setup notes in docs/development.md.
